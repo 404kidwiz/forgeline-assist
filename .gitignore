@@ -1,0 +1,10 @@
+# local tool/session state — never shared
+.claude/
+.DS_Store
+
+# safety net; each package also has its own .gitignore
+node_modules/
+.env
+.env.local
+!.env.example
+logs/

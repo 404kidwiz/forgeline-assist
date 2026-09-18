@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ForgeLine Assist — investor deck (fictional demo company)</title>
+<style>
+/* Tokens follow DESIGN.md section 5 (warm canvas, charcoal ink, restrained blue accent). */
+:root{
+  --canvas:#F7F8F6; --surface:#FFFFFF; --subtle:#EEF1EE; --ink:#252928; --muted:#5B6460;
+  --divider:#DDE2DE; --border:#7C8580; --accent:#285CC4; --accent-soft:#EAF0FC;
+  --ok:#276344; --ok-fill:#EAF4ED; --warn:#805414; --warn-fill:#FFF3DA; --danger:#A32D36; --danger-fill:#FCEEF0;
+  --serif:"Newsreader",Georgia,"Times New Roman",serif;
+  --sans:"Geist Sans","Geist",system-ui,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
+  --mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--ink);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5}
+/* Stage keeps 16:9 and letterboxes inside the viewport. */
+.stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+.deck{position:relative;width:min(100vw,177.78vh);aspect-ratio:16/9;background:var(--canvas);overflow:hidden;
+  font-size:calc(min(100vw,177.78vh) / 80)} /* 1 unit = 1.25% of width; 16px body at 1280px */
+.slide{position:absolute;inset:0;padding:3.5em 4em 3.2em;display:none;flex-direction:column;background:var(--canvas)}
+.slide.active{display:flex}
+.slide:focus{outline:none}
+h1,h2,h3{margin:0;font-weight:600;letter-spacing:-.01em}
+h1{font-family:var(--serif);font-weight:400;font-size:3.2em;line-height:1.1}
+h2{font-family:var(--serif);font-weight:400;font-size:2.25em;line-height:1.15;max-width:22ch}
+h3{font-size:1.15em;line-height:1.3}
+p{margin:0}
+.kicker{font-size:1em;font-weight:600;color:var(--accent);margin-bottom:.8em}
+.lede{font-size:1.25em;line-height:1.5;color:var(--muted);max-width:60ch;margin-top:.9em}
+.body{flex:1;margin-top:1.8em;display:flex;flex-direction:column;gap:1em;min-height:0}
+.grid{display:grid;gap:1em}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--surface);border:1px solid var(--divider);border-radius:.75em;padding:1.1em 1.2em}
+.card h3{margin-bottom:.4em}
+.card p{color:var(--muted);font-size:1em}
+.card.tone-ok{border-color:#b9d7c4;background:var(--ok-fill)} .card.tone-ok p{color:var(--ok)}
+.card.tone-warn{background:var(--warn-fill);border-color:#e9d3a0}
+.card.tone-danger{background:var(--danger-fill);border-color:#efc3c8}
+ul{margin:0;padding-left:1.2em}
+li{margin:.3em 0}
+.muted{color:var(--muted)}
+.mono{font-family:var(--mono);font-size:.92em}
+.badge{display:inline-block;font-size:.95em;font-weight:600;padding:.2em .7em;border-radius:999px;background:var(--subtle);color:var(--muted);border:1px solid var(--divider)}
+.badge.accent{background:var(--accent-soft);color:var(--accent);border-color:#c5d5f3}
+.badge.warn{background:var(--warn-fill);color:var(--warn);border-color:#e9d3a0}
+.badge.ok{background:var(--ok-fill);color:var(--ok);border-color:#b9d7c4}
+.badge.danger{background:var(--danger-fill);color:var(--danger);border-color:#efc3c8}
+.tbd{font-family:var(--mono);color:var(--warn);background:var(--warn-fill);padding:0 .35em;border-radius:.25em}
+.foot{position:absolute;left:4em;right:4em;bottom:1.3em;display:flex;justify-content:space-between;align-items:center;font-size:.875em;color:var(--muted)}
+.foot .demo{color:var(--warn);font-weight:600}
+/* Title slide */
+.title{justify-content:center}
+.title .mark{width:3.2em;height:3.2em;border-radius:50%;background:linear-gradient(135deg,var(--accent-soft),#dfe9d8);border:1px solid var(--divider);margin-bottom:1.6em}
+.title h1{max-width:18ch}
+.title .row{display:flex;gap:.6em;margin-top:1.6em;flex-wrap:wrap}
+/* Steps / timeline */
+.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:.8em;counter-reset:step}
+.step{background:var(--surface);border:1px solid var(--divider);border-radius:.75em;padding:1em;position:relative}
+.step::before{counter-increment:step;content:counter(step);display:inline-flex;width:1.6em;height:1.6em;border-radius:50%;background:var(--accent);color:#fff;font-weight:600;font-size:.85em;align-items:center;justify-content:center;margin-bottom:.6em}
+.step h3{font-size:1em}.step p{font-size:1em;color:var(--muted);margin-top:.3em}
+/* Demo mock */
+.mock{display:grid;grid-template-columns:1.15fr .85fr;gap:1em;flex:1;min-height:0}
+.chat{background:var(--surface);border:1px solid var(--divider);border-radius:1em;padding:1.1em 1.3em;display:flex;flex-direction:column;gap:.8em;box-shadow:0 12px 32px rgba(37,41,40,.06);overflow:hidden}
+.msg{padding:.7em .9em;border-radius:.75em;font-size:1em;line-height:1.45;max-width:95%}
+.msg.user{background:var(--accent-soft);align-self:flex-end}
+.msg.agent{background:var(--subtle)}
+.msg small{display:block;color:var(--muted);font-size:.875em;margin-top:.35em}
+.cite{font-family:var(--mono);font-size:1em;color:var(--accent)}
+.side{display:flex;flex-direction:column;gap:.8em}
+.side .card{padding:.9em 1em}.side .card p{font-size:1em}
+/* Architecture SVG */
+svg{width:100%;height:auto;display:block}
+.arch text{font-family:var(--sans);font-size:15px;fill:var(--ink)}
+.arch .lbl{font-size:13.5px;fill:var(--muted)}
+.arch .box{fill:var(--surface);stroke:var(--divider);stroke-width:1.5;rx:10}
+.arch .box.accent{fill:var(--accent-soft);stroke:#b8cbf0}
+.arch .box.warn{fill:var(--warn-fill);stroke:#e9d3a0}
+.arch .box.ok{fill:var(--ok-fill);stroke:#b9d7c4}
+.arch .arrow{stroke:var(--border);stroke-width:1.5;fill:none;marker-end:url(#ah)}
+.arch .lane{font-size:13px;fill:var(--muted);font-weight:600;letter-spacing:.08em}
+/* Stage rows */
+.stages{display:flex;flex-direction:column;gap:.4em}
+.stage-row{display:grid;grid-template-columns:2.2em 1fr 7em 1fr;gap:1em;align-items:center;background:var(--surface);border:1px solid var(--divider);border-radius:.6em;padding:.45em 1em;font-size:1em}
+.stage-row .n{font-family:var(--mono);color:var(--accent);font-weight:600}
+.stage-row .h{font-family:var(--mono);color:var(--muted);text-align:center}
+.stage-row .gate{color:var(--muted);font-size:1em}
+/* Controls */
+.nav{position:fixed;right:1rem;bottom:1rem;display:flex;gap:.5rem;align-items:center;z-index:5;font-family:var(--sans)}
+.nav button{background:var(--surface);color:var(--ink);border:1px solid var(--border);border-radius:10px;min-width:44px;height:44px;font-size:16px;cursor:pointer}
+.nav button:hover{background:var(--subtle)}
+.nav button:focus-visible,.slide:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.counter{background:var(--surface);border:1px solid var(--divider);border-radius:10px;padding:0 .8rem;height:44px;display:flex;align-items:center;font-variant-numeric:tabular-nums;color:var(--muted);font-size:15px}
+.help{position:fixed;left:1rem;bottom:1rem;background:var(--surface);color:var(--muted);border:1px solid var(--divider);border-radius:10px;padding:0 .8rem;height:44px;display:flex;align-items:center;font-size:15px;z-index:5;margin:0}
+/* Print: one slide per page, all visible, scaled to landscape */
+@media print{
+  @page{size:landscape;margin:0}
+  html,body{background:#fff;height:auto}
+  .stage{position:static;display:block}
+  .deck{width:100%;aspect-ratio:auto;font-size:14px;overflow:visible;background:#fff}
+  .slide{position:relative;display:flex;height:100vh;page-break-after:always;break-after:page}
+  .nav,.help{display:none}
+}
+</style>
+</head>
+<body>
+<div class="stage">
+<div class="deck" id="deck" aria-live="polite">
+
+<!-- 1 Title -->
+<section class="slide title active" data-title="Title" tabindex="-1">
+  <div class="mark" aria-hidden="true"></div>
+  <p class="kicker">ForgeLine Assist · Fictional demo company</p>
+  <h1>The plant supervisor's workspace that answers from approved documents and acts only with your approval.</h1>
+  <p class="lede">An agentic assistant for safety, maintenance and quality on the floor. Ask, find procedures, read the exact source, and turn findings into tracked work.</p>
+  <div class="row">
+    <span class="badge accent">Seed-stage concept</span>
+    <span class="badge">Round and ask: <span class="tbd">[TBD]</span></span>
+    <span class="badge warn">ForgeLine Manufacturing is fictional</span>
+  </div>
+  <div class="foot"><span class="demo">Fictional demo — not for operational use</span><span>September 2026</span></div>
+</section>
+
+<!-- 2 Problem -->
+<section class="slide" data-title="Problem" tabindex="-1">
+  <p class="kicker">Problem</p>
+  <h2>Supervisors spend the shift hunting for the current procedure, then act on memory.</h2>
+  <div class="body">
+    <div class="grid g3">
+      <div class="card"><h3>Time lost finding the right page</h3><p>Safety, maintenance and quality rules live in separate documents. A single incident, like a label mismatch on a packing station, touches all three.</p></div>
+      <div class="card"><h3>Stale revisions in circulation</h3><p>A sampling interval changes from 120 to 60 minutes and the old printout keeps being followed. Nobody is told which revision is active.</p></div>
+      <div class="card"><h3>Actions go untracked</h3><p>Follow-ups are agreed verbally, handovers are rewritten from memory, and tickets in external systems drift from what was actually decided.</p></div>
+    </div>
+    <p class="muted" style="font-size:.95em">Assumption: these pains are drawn from the planning interviews behind this demo, not from a measured customer study. Quantified time-loss figures are <span class="tbd">[TBD]</span>.</p>
+  </div>
+  <div class="foot"><span class="demo">Fictional demo</span><span>2</span></div>
+</section>
+
+<!-- 3 Why now -->
+<section class="slide" data-title="Why now" tabindex="-1">
+  <p class="kicker">Why now</p>
+  <h2>Agentic tooling finally makes document-grounded help practical, but only with guardrails.</h2>
+  <div class="body">
+    <div class="grid g2">
+      <div class="card"><h3>Agent frameworks are production-ready</h3><p>Platforms such as Dify expose tool-calling agents with bounded tools and published workflow versions. One agent definition can run many isolated investigations.</p></div>
+      <div class="card"><h3>Retrieval over approved sources works</h3><p>Answers can cite the exact document, revision and section. Provenance is checkable by the supervisor, not taken on faith.</p></div>
+      <div class="card"><h3>Plants already keep docs in versioned repositories</h3><p>Markdown in Git, review rules and webhooks give a clean signal for "this revision is now approved." Monitoring can be revision-aware from day one.</p></div>
+      <div class="card tone-warn"><h3>Trust is the gap</h3><p style="color:var(--warn)">Generic chat assistants cannot be allowed to touch plant systems. The opportunity is an assistant whose every external effect is approved exactly as shown.</p></div>
+    </div>
+  </div>
+  <div class="foot"><span class="demo">Fictional demo</span><span>3</span></div>
+</section>
+
+<!-- 4 Product -->
+<section class="slide" data-title="Product" tabindex="-1">
+  <p class="kicker">Product</p>
+  <h2>Four connected views, one investigation object.</h2>
+  <div class="body">
+    <div class="grid g4">
+      <div class="card"><span class="badge accent">Ask</span><h3 style="margin-top:.6em">Investigate a question</h3><p>Natural-language requests with inline sources and follow-ups. Case context persists.</p></div>
+      <div class="card"><span class="badge accent">Procedures</span><h3 style="margin-top:.6em">Find approved sources</h3><p>Search and filter by domain, equipment and revision. Opening a result keeps the investigation.</p></div>
+      <div class="card"><span class="badge accent">Manual</span><h3 style="margin-top:.6em">Read the exact evidence</h3><p>Document, revision and section always visible, with the assistant beside the page.</p></div>
+      <div class="card"><span class="badge accent">Shift Desk</span><h3 style="margin-top:.6em">Follow work and changes</h3><p>Attention queue, tasks, document updates, handovers and the approval inbox.</p></div>
+    </div>
+    <div class="card" style="display:flex;gap:2em;align-items:center">
+      <div style="flex:1"><h3>The investigation is the shared object</h3><p>Equipment and batch context, evidence, questions, tasks and approval requests travel together across all four views. Switching cases switches everything; a citation never starts a new case.</p></div>
+      <div style="flex:1"><h3>Three kinds of work, kept distinct</h3><p>Answering, creating demo tasks, and executing external actions each show their own status, so the supervisor always knows what really happened.</p></div>
+    </div>
+  </div>
+  <div class="foot"><span class="demo">Fictional demo</span><span>4</span></div>
+</section>
+
+<!-- 5 Live demo -->
+<section class="slide" data-title="Live demo" tabindex="-1">
+  <p class="kicker">Live demo · flagship scenario</p>
+  <h2>PK-04 is printing the wrong labels on batch B-204.</h2>
+  <div class="body">
+    <div class="mock">
+      <div class="chat" aria-label="Illustrative Ask conversation">
+        <div class="msg user">PK-04 is printing the wrong labels on B-204. Check maintenance, quality and safety requirements; create the demo follow-up tasks; draft the handover; and prepare an issue for my approval.</div>
+        <div class="msg agent">
+          Reading the approved sources for PK-04 across three domains.
+          <small><span class="cite">MNT-002 rev 2 · PK-04 service requests</span> · <span class="cite">QLT-002 · label and hold</span> · <span class="cite">SAF-001 §1 · restricted zones</span></small>
+        </div>
+        <div class="msg agent">
+          Quality requires reporting and a hold review for the affected batch; maintenance requires a service request, not an on-the-spot fix. I do not have a verified root cause. Observation OBS-001 (10:15) is still under review.
+          <small>Created 2 demo tasks (receipts stored) · Handover draft ready · 1 external issue proposed, awaiting your approval</small>
+        </div>
+        <div class="msg agent" style="border:1px dashed var(--danger);background:var(--danger-fill)">
+          One tool call failed (shift snapshot). Shown, not hidden; the answer above does not rely on it.
+        </div>
+      </div>
+      <div class="side">
+        <div class="card"><h3>What the supervisor sees</h3><p>Every claim links to a document, revision and section. Open it in Manual without losing the case.</p></div>
+        <div class="card tone-warn"><h3>Action review</h3><p style="color:var(--warn)">Target: GitHub Issues, test repository · Create issue · exact title and body · evidence revision · proposed actor. Approve, edit (invalidates), or reject.</p></div>
+        <div class="card tone-ok"><h3>After approval</h3><p>Real GitHub action · test repository. Receipt: repo, issue number, URL. Shift Desk and Ask show the same status.</p></div>
+        <div class="card"><h3>In parallel</h3><p>A second supervisor investigates conveyor CV-12 in an isolated run. No shared context.</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span class="demo">Fictional demo — equipment, batches and documents are seeded fixtures</span><span>5</span></div>
+</section>
+
+<!-- 6 How it works -->
+<section class="slide" data-title="How it works" tabindex="-1">
+  <p class="kicker">How it works</p>
+  <h2>One agent, bounded tools, deterministic execution.</h2>
+  <div class="body" style="margin-top:1em">
+    <svg class="arch" viewBox="0 0 1200 430" role="img" aria-labelledby="archTitle">
+      <title id="archTitle">Architecture: browser to Next.js to Postgres and worker to Dify agent to bounded tools; separate approval executor and monitoring loop</title>
+      <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#7C8580"/></marker></defs>
+
+      <text class="lane" x="20" y="30">INVESTIGATION PATH</text>
+      <rect class="box" x="20" y="50" width="150" height="70" rx="10"/><text x="95" y="80" text-anchor="middle">Browser</text><text class="lbl" x="95" y="100" text-anchor="middle">4 views, 1 case</text>
+      <rect class="box" x="220" y="50" width="170" height="70" rx="10"/><text x="305" y="80" text-anchor="middle">Next.js API</text><text class="lbl" x="305" y="100" text-anchor="middle">auth, roles, Vercel</text>
+      <rect class="box" x="440" y="50" width="190" height="70" rx="10"/><text x="535" y="80" text-anchor="middle">Postgres + worker</text><text class="lbl" x="535" y="100" text-anchor="middle">cases, jobs, leases, receipts</text>
+      <rect class="box accent" x="680" y="50" width="190" height="70" rx="10"/><text x="775" y="80" text-anchor="middle">Dify agent workflow</text><text class="lbl" x="775" y="100" text-anchor="middle">one definition, pinned version</text>
+      <rect class="box" x="920" y="50" width="260" height="70" rx="10"/><text x="1050" y="80" text-anchor="middle">Bounded tools</text><text class="lbl" x="1050" y="100" text-anchor="middle">retrieve · read section · create demo task · propose action</text>
+      <path class="arrow" d="M170 85H218"/><path class="arrow" d="M390 85H438"/><path class="arrow" d="M630 85H678"/><path class="arrow" d="M870 85H918"/>
+      <path class="arrow" d="M775 120V160"/><rect class="box ok" x="640" y="160" width="270" height="52" rx="10"/><text x="775" y="192" text-anchor="middle">Validated answer with sources, or proposed action</text>
+
+      <text class="lane" x="20" y="260">APPROVAL EXECUTOR (outside the model)</text>
+      <rect class="box warn" x="20" y="280" width="200" height="60" rx="10"/><text x="120" y="305" text-anchor="middle">Exact-action approval</text><text class="lbl" x="120" y="325" text-anchor="middle">payload hash · approver · expiry</text>
+      <rect class="box" x="270" y="280" width="200" height="60" rx="10"/><text x="370" y="305" text-anchor="middle">Deterministic executor</text><text class="lbl" x="370" y="325" text-anchor="middle">scoped credentials, idempotency</text>
+      <rect class="box" x="520" y="280" width="180" height="60" rx="10"/><text x="610" y="305" text-anchor="middle">GitHub Issues</text><text class="lbl" x="610" y="325" text-anchor="middle">test repository</text>
+      <rect class="box ok" x="750" y="280" width="180" height="60" rx="10"/><text x="840" y="305" text-anchor="middle">Stored receipt</text><text class="lbl" x="840" y="325" text-anchor="middle">repo · issue # · URL</text>
+      <path class="arrow" d="M220 310H268"/><path class="arrow" d="M470 310H518"/><path class="arrow" d="M700 310H748"/>
+
+      <text class="lane" x="20" y="385">MONITORING LOOP</text>
+      <rect class="box" x="20" y="395" width="230" height="30" rx="8"/><text class="lbl" x="135" y="415" text-anchor="middle" style="fill:#252928">Signed push event / 15-min reconcile</text>
+      <rect class="box" x="290" y="395" width="200" height="30" rx="8"/><text class="lbl" x="390" y="415" text-anchor="middle" style="fill:#252928">Verify approved revision</text>
+      <rect class="box" x="530" y="395" width="220" height="30" rx="8"/><text class="lbl" x="640" y="415" text-anchor="middle" style="fill:#252928">Stage, index, smoke check, promote</text>
+      <rect class="box accent" x="790" y="395" width="170" height="30" rx="8"/><text class="lbl" x="875" y="415" text-anchor="middle" style="fill:#252928">Same agent workflow</text>
+      <rect class="box" x="1000" y="395" width="180" height="30" rx="8"/><text class="lbl" x="1090" y="415" text-anchor="middle" style="fill:#252928">In-app + email alert</text>
+      <path class="arrow" d="M250 410H288"/><path class="arrow" d="M490 410H528"/><path class="arrow" d="M750 410H788"/><path class="arrow" d="M960 410H998"/>
+    </svg>
+    <p class="muted" style="font-size:.9em">Dify Cloud is proposed, not confirmed. Database, worker and email providers are unselected. Dify workflow runs are stateless; the application supplies scoped case context.</p>
+  </div>
+  <div class="foot"><span class="demo">Fictional demo</span><span>6</span></div>
+</section>
+
+<!-- 7 Trust & safety -->
+<section class="slide" data-title="Trust and safety" tabindex="-1">
+  <p class="kicker">Trust and safety</p>
+  <h2>The model proposes. People approve. Code executes.</h2>
+  <div class="body">
+    <div class="grid g2">
+      <div class="card"><h3>Exact-action approval</h3><p>The review screen shows target system, account, resource, action type, exact fields, evidence revision and proposed actor. An edited payload, changed target or superseded source revision invalidates the approval. The model cannot set approved = true.</p></div>
+      <div class="card"><h3>Provenance validation</h3><p>Answers are validated against retrieved sources before display. Missing evidence is stated, not filled in. Failed tool calls stay visible so unsupported conclusions cannot slip through.</p></div>
+      <div class="card tone-danger"><h3 style="color:var(--danger)">Emergency boundary</h3><p style="color:var(--danger)">No emergency dispatch, no bypass instructions, no restart or product-release authorization. Closing an issue is never equipment clearance.</p></div>
+      <div class="card tone-danger"><h3 style="color:var(--danger)">No machinery control</h3><p style="color:var(--danger)">The assistant reads documents and writes tickets. It never connects to PLCs, telemetry or line controls. Credentials and the allowlisted repository are server configuration, not agent inputs.</p></div>
+    </div>
+    <p class="muted" style="font-size:.95em">Also: no success is reported without a persisted or external receipt; secrets stay server-side and out of logs; email review links never approve anything.</p>
+  </div>
+  <div class="foot"><span class="demo">Fictional demo</span><span>7</span></div>
+</section>
+
+<!-- 8 Monitoring -->
+<section class="slide" data-title="Keeping current" tabindex="-1">
+  <p class="kicker">Keeping supervisors current</p>
+  <h2>A document is not authority because it was uploaded.</h2>
+  <div class="body">
+    <div class="steps">
+      <div class="step"><h3>Detect</h3><p>Signed GitHub push on approved knowledge paths; 15-minute reconciliation catches missed events.</p></div>
+      <div class="step"><h3>Verify</h3><p>Only revisions approved by the designated document owner qualify. Drafts and unapproved branches are ignored.</p></div>
+      <div class="step"><h3>Stage and check</h3><p>Index the new revision, run a retrieval smoke check, then promote. A failed update keeps the last working corpus and shows a stale warning.</p></div>
+      <div class="step"><h3>Compare</h3><p>Old versus new, impacted equipment and open cases. Pending approvals tied to a superseded procedure are re-checked or invalidated.</p></div>
+      <div class="step"><h3>Notify</h3><p>One update event, in-app plus email to verified subscribers. Unchanged checks stay silent; routine changes group into a shift digest.</p></div>
+    </div>
+    <div class="grid g2">
+      <div class="card"><h3>Seeded example</h3><p><span class="mono">CHG-001</span>: QLT-001 revision 2 → 3, inspection sampling 120 → 60 minutes. Expected result: one update investigation, one accurate alert, no alert on unchanged state.</p></div>
+      <div class="card"><h3>Email done honestly</h3><p>Durable outbox, stable notification IDs, delivery and bounce tracked separately. Provider acceptance is not proof of inbox delivery. Quiet hours with owner-defined urgent exceptions.</p></div>
+    </div>
+  </div>
+  <div class="foot"><span class="demo">Fictional demo</span><span>8</span></div>
+</section>
+
+<!-- 9 Go-to-market -->
+<section class="slide" data-title="Go-to-market" tabindex="-1">
+  <p class="kicker">Go-to-market</p>
+  <h2>Start with one plant, one connector, one measurable shift.</h2>
+  <div class="body">
+    <div class="grid g3">
+      <div class="card"><h3>Who</h3><p>Mid-size discrete manufacturers with written safety, maintenance and quality procedures and shift supervisors who own follow-ups. Assumption: they already keep documents in reviewable repositories or can migrate a subset.</p></div>
+      <div class="card"><h3>How</h3><p>Pilot with one plant. Seed their approved documents, connect one ticketing target, define one approver. Measure time-to-answer, citation accuracy and approved-action throughput.</p></div>
+      <div class="card"><h3>Then</h3><p>Expand connectors using the same approval and receipt contracts. Add plants, not agent varieties.</p></div>
+    </div>
+    <div class="card">
+      <h3>What we are not claiming</h3>
+      <p>Market size (TAM/SAM/SOM), pricing, customer counts and revenue are <span class="tbd">[TBD]</span>. No customers, pilots or revenue exist for this fictional demo company. Business model is an open decision: per-plant subscription is the working assumption.</p>
+    </div>
+  </div>
+  <div class="foot"><span class="demo">Fictional demo</span><span>9</span></div>
+</section>
+
+<!-- 10 Roadmap -->
+<section class="slide" data-title="Roadmap" tabindex="-1">
+  <p class="kicker">Roadmap</p>
+  <h2>18 to 30 focused hours to a full working demo, then pilots.</h2>
+  <div class="body">
+    <div class="stages">
+      <div class="stage-row"><span class="n">1</span><span>Foundation and contracts</span><span class="h">2–3 h</span><span class="gate">Gate: an authenticated case can invoke and recover a real Dify run</span></div>
+      <div class="stage-row"><span class="n">2</span><span>Evidence and agent</span><span class="h">3–5 h</span><span class="gate">Gate: mixed-domain and follow-up tests pass with exact sources</span></div>
+      <div class="stage-row"><span class="n">3</span><span>Unified interface and demo tasks</span><span class="h">4–6 h</span><span class="gate">Gate: task receipt and evidence consistent across views and sessions</span></div>
+      <div class="stage-row"><span class="n">4</span><span>Durable execution and approved connector</span><span class="h">4–7 h</span><span class="gate">Gate: approve once, execute once, record receipt; no duplicates on replay</span></div>
+      <div class="stage-row"><span class="n">5</span><span>Monitoring, evaluation and handoff</span><span class="h">5–9 h</span><span class="gate">Gate: one approved change, one accurate update, silence otherwise</span></div>
+    </div>
+    <div class="grid g2">
+      <div class="card"><h3>After the demo</h3><p>Vercel go-live as a separate verified step, then first plant pilot. Pilot timing depends on partner readiness: <span class="tbd">[TBD]</span>.</p></div>
+      <div class="card"><h3>Deliberately out of scope for v1</h3><p>Voice, machine control, a fleet of specialist agents, multiple connector platforms. Estimate assumes ready credentials and ordinary APIs; it is not a guaranteed date.</p></div>
+    </div>
+  </div>
+  <div class="foot"><span class="demo">Fictional demo</span><span>10</span></div>
+</section>
+
+<!-- 11 Team & ask -->
+<section class="slide" data-title="Team and ask" tabindex="-1">
+  <p class="kicker">Team and ask</p>
+  <h2>Placeholders until real people and numbers exist.</h2>
+  <div class="body">
+    <div class="grid g3">
+      <div class="card"><h3><span class="tbd">[TBD]</span> · Founder / product</h3><p>Background and manufacturing operations experience <span class="tbd">[TBD]</span>.</p></div>
+      <div class="card"><h3><span class="tbd">[TBD]</span> · Engineering</h3><p>Agent systems, durable workers and integration experience <span class="tbd">[TBD]</span>.</p></div>
+      <div class="card"><h3><span class="tbd">[TBD]</span> · Plant advisor</h3><p>Shift-supervision and safety-compliance perspective <span class="tbd">[TBD]</span>.</p></div>
+    </div>
+    <div class="card" style="border-color:#c5d5f3;background:var(--accent-soft)">
+      <h3>The ask</h3>
+      <p style="color:var(--ink)">Raising <span class="tbd">[TBD amount]</span> to fund: completing the full demo (18–30 h), the first plant pilot, and connector and email provider onboarding. Use of funds split, runway and milestones: <span class="tbd">[TBD]</span>. No revenue, valuation or traction figures are asserted on this deck.</p>
+    </div>
+  </div>
+  <div class="foot"><span class="demo">Fictional demo</span><span>11</span></div>
+</section>
+
+<!-- 12 Closing -->
+<section class="slide title" data-title="Closing" tabindex="-1">
+  <p class="kicker">ForgeLine Assist</p>
+  <h1>Ask. Verify the source. Approve the exact action. Stay current.</h1>
+  <p class="lede">A supervisor workspace that keeps humans in charge of every effect on the plant.</p>
+  <div class="row">
+    <span class="badge">Contact: <span class="tbd">[TBD]</span></span>
+    <span class="badge">Demo request: <span class="tbd">[TBD]</span></span>
+    <span class="badge warn">Fictional demo company</span>
+  </div>
+  <div class="foot"><span class="demo">Fictional demo — not for operational use</span><span>12</span></div>
+</section>
+
+</div>
+</div>
+
+<div class="nav" role="group" aria-label="Slide navigation">
+  <button type="button" id="prev" aria-label="Previous slide">&#8592;</button>
+  <span class="counter" id="counter" aria-live="polite">1 / 12</span>
+  <button type="button" id="next" aria-label="Next slide">&#8594;</button>
+</div>
+<p class="help">← → or click to navigate · Home/End</p>
+
+<script>
+(function(){
+  var slides=Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var i=Math.max(0,Math.min(slides.length-1,(parseInt(location.hash.slice(1),10)||1)-1));
+  var counter=document.getElementById('counter');
+  function show(n){
+    i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach(function(s,k){s.classList.toggle('active',k===i);});
+    counter.textContent=(i+1)+' / '+slides.length;
+    history.replaceState(null,'','#'+(i+1));
+    document.title=slides[i].dataset.title+' — ForgeLine Assist deck';
+    slides[i].focus({preventScroll:true});
+  }
+  document.getElementById('prev').addEventListener('click',function(e){e.stopPropagation();show(i-1);});
+  document.getElementById('next').addEventListener('click',function(e){e.stopPropagation();show(i+1);});
+  document.getElementById('deck').addEventListener('click',function(e){
+    // Click right half advances, left half goes back.
+    var r=this.getBoundingClientRect();
+    show(e.clientX-r.left>r.width/2?i+1:i-1);
+  });
+  document.addEventListener('keydown',function(e){
+    if(e.metaKey||e.ctrlKey||e.altKey)return;
+    switch(e.key){
+      case 'ArrowRight':case 'ArrowDown':case ' ':case 'PageDown':e.preventDefault();show(i+1);break;
+      case 'ArrowLeft':case 'ArrowUp':case 'PageUp':e.preventDefault();show(i-1);break;
+      case 'Home':e.preventDefault();show(0);break;
+      case 'End':e.preventDefault();show(slides.length-1);break;
+    }
+  });
+  window.addEventListener('hashchange',function(){show((parseInt(location.hash.slice(1),10)||1)-1);});
+  show(i);
+})();
+</script>
+</body>
+</html>

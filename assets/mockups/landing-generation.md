@@ -1,0 +1,23 @@
+# Landing mockup v1
+
+Generated using the built-in image generation tool. The tool does not expose a model selector or return a verifiable model ID; Image 2 was requested by the user but the precise backend model is not independently confirmed.
+
+Output: [forgeline-landing-v1.png](forgeline-landing-v1.png). Visual concept only; no frontend implementation. Reviewed for hierarchy, source sample and overall composition. Generated additions such as the attachment icon and decorative marginal copy are not additions to the approved product scope. DESIGN.md remains authoritative for implementation.
+
+## Generation prompt
+
+Create an exceptionally polished, high-fidelity desktop LANDING PAGE MOCKUP for "ForgeLine Assist", a fictional manufacturing supervisor AI workspace powered by Dify. Use case: ui-mockup. This is a marketing/product introduction landing page with a large realistic embedded product interface preview, not just an app dashboard. Deliver one crisp flat front-on website design image, approximately 1536px wide by 2048px tall. No device frame, no perspective tilt, no browser chrome, no watermark.
+
+ART DIRECTION: premium calm editorial SaaS design inspired by the spacious SchoolAI conversational interface: warm off-white #F7F8F6, charcoal #252928, muted sage, restrained cobalt #285CC4, white surfaces, extremely faint blue/sage atmospheric wash behind hero preview only. Beautiful high-contrast serif headline and Geist-like sans serif UI typography. Meticulous alignment, ample breathing room, thin dividers, restrained 12px rounding except generous 28px question composer, subtle diffused shadow. Realistic polished website screenshot, legible typography, coherent spacing; no cartoon factory art, no glossy 3D robotics, no stock photography, no fake customer logos or metrics.
+
+PAGE COMPOSITION:
+Top navigation with modest original abstract line mark and wordmark "ForgeLine Assist" on left, middle links "Workspace" "How it works" "Documentation", right outlined "View demo" button. Small discreet "FICTIONAL PLANT DEMO" label.
+Hero in upper portion: elegant large centered serif headline exactly "The right answer.\nRight on the floor." Supporting sans serif copy exactly "One workspace for safety, maintenance and quality. Ask a question, inspect the source, and keep your shift moving." Two buttons: cobalt "Explore the demo" and quiet outlined "See how it works". Small understated line "Built with Dify · Designed for supervisors". Spacious but not empty.
+
+Dominant central product preview filling roughly half the page: a premium white app frame with left navigation, central conversation panel and slim right evidence panel, all flat and readable. Top product bar shows "ForgeLine" and "FL-01 · Day shift" and small "Fictional demo" badge. Sidebar: "Ask" selected pale blue; "Procedures"; "Manual"; "Shift Desk". Bottom small user "Maya Chen" "Supervisor". Main content shows serif greeting "Good morning, Maya." then compact question from user "How often should we inspect PX-20 dimensions?" An elegant answer block says "Inspect 5 samples every 60 minutes." and "The current quality standard is QLT-001 v3." Source chip "QLT-001 · v3 · Sampling". Beneath answer a compact pale green check label "Supported by an approved source". Bottom large rounded composer "Ask about safety, maintenance or quality…" with Equipment and Sources controls and blue circular send button. Right panel title "Sources" with document row "Dimensional inspection" and metadata "QLT-001 · Version 3", excerpt "5 samples every 60 minutes", a clear "Open procedure" text action. Below a subtle source update note "Previous version: every 120 minutes." This is a static fictional sample, avoid fabricated live telemetry.
+
+Below product preview: elegant horizontal row of three flat numbered editorial columns, not floating card clutter: "01  Ask naturally" / "Start with the question on your floor."; "02  Inspect the evidence" / "See the document, revision and exact section."; "03  Act with approval" / "Review proposed actions before they reach GitHub." Fine gray rules and compact line icons.
+
+Lower closing section with a left-aligned serif heading "One agent. A clearer shift." and right-side short text "Bring procedures, investigations and follow-ups into one shared workspace." Bottom fine divider footer "ForgeLine Assist" and "Fictional demonstration · Human approval for external actions".
+
+Maintain exceptional craft, readable exact copy, visually harmonious scale, no extra lorem ipsum. The hero and realistic app preview are the focus. No unrequested dark theme or flashy gradients.
