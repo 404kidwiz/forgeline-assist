@@ -1,0 +1,194 @@
+# ForgeLine Assist — tool contracts as an OpenAPI 3.0 schema.
+#
+# Design artifact, not a verified Dify export. It has not been imported into a
+# real Dify workspace or run against a live Agent node. Dify supports adding a
+# "Custom Tool" from an OpenAPI schema (Workspace → Tools → Custom → Import
+# from URL/schema) — this file is written to be importable that way once a
+# workspace exists, with `server.url` pointed at the deployed web app's origin.
+#
+# Contracts mirror web/src/lib/agent/tools.ts exactly (read that file, not this
+# comment, if they ever drift). Filters (approved-revision-only, equipment
+# scoping) are enforced server-side by that code, not by the model — this
+# schema only describes the request/response shape, not the policy.
+
+openapi: 3.0.3
+info:
+  title: ForgeLine Assist plant-doc tools
+  version: "1.0.0"
+  description: >
+    Read-only evidence tools plus two allowed demo writes and one proposal-only
+    action tool, for a Dify Agent node's function-calling tool set.
+servers:
+  - url: https://REPLACE-WITH-DEPLOYED-APP-ORIGIN/api/tools
+    description: Set after web/ is deployed; see PROJECT_SUMMARY.md for the live URL.
+
+paths:
+  /search_plant_docs:
+    post:
+      operationId: search_plant_docs
+      summary: Query one approved safety/maintenance/quality domain for evidence.
+      description: >
+        Read only. Returns only the current approved revision. Call once per
+        domain that's relevant — the app runs the three domain branches in
+        parallel and joins results; do not assume one call covers all domains.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [query, domain]
+              properties:
+                query: { type: string }
+                domain: { type: string, enum: [safety, maintenance, quality] }
+                equipment: { type: string, description: "Equipment ID, e.g. PK-04. Omit if ambiguous — do not invent one." }
+      responses:
+        "200":
+          description: Zero or more evidence chunks for this domain (empty is a valid, non-error result).
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/DocChunk" }
+
+  /read_procedure:
+    post:
+      operationId: read_procedure
+      summary: Read the exact approved revision/section of one document.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [docId]
+              properties:
+                docId: { type: string, example: SAF-001 }
+                section: { type: string }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/DocChunk" }
+
+  /compare_document_versions:
+    post:
+      operationId: compare_document_versions
+      summary: Historical read comparing an archived revision against the current one.
+      description: >
+        The only tool allowed to return archived/superseded content. Historical
+        content returned here must never govern a current operational answer.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [docId]
+              properties: { docId: { type: string } }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  current: { type: array, items: { $ref: "#/components/schemas/DocChunk" } }
+                  archived: { type: array, items: { $ref: "#/components/schemas/DocChunk" } }
+
+  /get_shift_snapshot:
+    post:
+      operationId: get_shift_snapshot
+      summary: Read the current fictional shift snapshot and open observations.
+      requestBody: { required: false, content: { application/json: { schema: { type: object } } } }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: { type: object, description: "SHIFT-nnn snapshot with observation list; no telemetry connection." }
+
+  /create_demo_task:
+    post:
+      operationId: create_demo_task
+      summary: Persist one fictional demo task. Allowed write, never implies restart/release authorization.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, assignee]
+              properties:
+                title: { type: string }
+                equipment: { type: string }
+                assignee: { type: string, description: "Existing user id, e.g. maya or jordan." }
+                due: { type: string, format: date }
+                origin: { type: string, description: "Investigation ID this task came from." }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TaskReceipt" }
+
+  /propose_external_action:
+    post:
+      operationId: propose_external_action
+      summary: Persist a proposed connector action for human review. Never writes externally.
+      description: >
+        Proposal only. The model cannot approve its own proposal and this call
+        never reaches GitHub/email/etc — it only creates an awaiting_approval
+        record that a human approver reviews at /approvals/{id}.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [investigationId, proposerId, title, body, evidenceIds, reason]
+              properties:
+                investigationId: { type: string }
+                proposerId: { type: string }
+                title: { type: string }
+                body: { type: string }
+                labels: { type: array, items: { type: string } }
+                evidenceIds:
+                  type: array
+                  items: { type: string }
+                  description: Must all have appeared in this run's own tool events; fabricated IDs are rejected server-side.
+                evidenceLabel: { type: string }
+                reason: { type: string }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ActionProposal" }
+
+components:
+  schemas:
+    DocChunk:
+      type: object
+      properties:
+        doc_id: { type: string }
+        revision: { type: integer }
+        section: { type: string }
+        category: { type: string, enum: [safety, maintenance, quality] }
+        effective_date: { type: string, format: date }
+        approval_status: { type: string, enum: [approved, superseded] }
+        excerpt: { type: string }
+        source_url: { type: string }
+        equipment: { type: array, items: { type: string } }
+    TaskReceipt:
+      type: object
+      properties:
+        taskId: { type: string }
+        title: { type: string }
+        version: { type: integer }
+    ActionProposal:
+      type: object
+      properties:
+        id: { type: string }
+        status: { type: string, enum: [draft, awaiting_approval, approved, rejected, expired, executing, succeeded, failed, unknown] }
+        payloadHash: { type: string }
+        expiresAt: { type: string, format: date-time }
