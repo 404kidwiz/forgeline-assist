@@ -142,3 +142,56 @@ The following integrations and live features could not be fully verified because
    - **Reason:** No transactional email provider API key (Resend, SendGrid, Postmark) or verified sender domain configured.
    - **Current Fallback:** Notifications are persisted and exposed only via in-app API `/api/notifications`.
    - **Requirement for Real Verification:** Configured transactional email provider with verified sending identity and webhook endpoints for bounce/delivery event reconciliation.
+
+---
+
+## 5. Production Deploy Verification (Vercel Live URL)
+
+**Deployment Date:** 2026-09-18  
+**Live Production URL:** `https://forgeline-assist-app.vercel.app`  
+**Deployment Target / Project:** `404kidwizs-projects/forgeline-assist-app` (`prj_WearEnUoRtkVlRrVID1npPKtGGek`)  
+**Direct Immutable Deployment:** `https://forgeline-assist-h4yu99owe-404kidwizs-projects.vercel.app`
+
+### Deployment Setup & Link
+```bash
+# Linked web/ to new independent Vercel project (separate from landing page)
+cd web && vercel link --project forgeline-assist-app --team 404kidwizs-projects --yes
+# Updated framework preset to Next.js
+vercel project update forgeline-assist-app --framework nextjs --auto-detect output-directory
+# Production deployment
+vercel deploy --prod --yes
+```
+**Deployment Output:**
+```
+▲ Next.js 16.3.5 (Turbopack)
+✓ Compiled successfully
+  Running TypeScript ...
+✓ Deploying outputs...
+  Production      https://forgeline-assist-h4yu99owe-404kidwizs-projects.vercel.app
+▲ Aliased         https://forgeline-assist-app.vercel.app
+✓ Ready in 30s
+```
+
+### Live Smoke Verification Suite
+
+| # | Check / Requirement | Exact Command Executed | Expected Output / Code | Actual Verbatim Output / Response | Status |
+|---|---|---|---|---|---|
+| 1 | `GET /` (Root redirect) | `curl -s -i "https://forgeline-assist-app.vercel.app/"` | HTTP 307 redirect to `/ask` | `HTTP/2 307`<br>`location: /ask` | **PASS** |
+| 2 | `GET /ask` (Ask view) | `curl -s -i "https://forgeline-assist-app.vercel.app/ask"` | HTTP 200 OK | `HTTP/2 200`<br>`content-type: text/html; charset=utf-8`<br>`x-matched-path: /ask` | **PASS** |
+| 3 | `GET /procedures` (Procedures view) | `curl -s -i "https://forgeline-assist-app.vercel.app/procedures"` | HTTP 200 OK | `HTTP/2 200`<br>`content-type: text/html; charset=utf-8`<br>`x-matched-path: /procedures` | **PASS** |
+| 4 | `GET /manual` (Manual root) | `curl -s -i "https://forgeline-assist-app.vercel.app/manual"` | HTTP 307 redirect to `/procedures` | `HTTP/2 307`<br>`location: /procedures` | **PASS** |
+| 5 | `GET /manual/SAF-001` (Manual document view) | `curl -s -i "https://forgeline-assist-app.vercel.app/manual/SAF-001"` | HTTP 200 OK | `HTTP/2 200`<br>`content-type: text/html; charset=utf-8`<br>`x-matched-path: /manual/[docId]` | **PASS** |
+| 6 | `GET /shift-desk` (Shift Desk view) | `curl -s -i "https://forgeline-assist-app.vercel.app/shift-desk"` | HTTP 200 OK | `HTTP/2 200`<br>`content-type: text/html; charset=utf-8`<br>`x-matched-path: /shift-desk` | **PASS** |
+| 7 | Create Flagship Investigation on Live URL | `curl -s -X POST "https://forgeline-assist-app.vercel.app/api/investigations" -H "Content-Type: application/json" -H "x-demo-user: maya" -d '{"question":"PK-04 is printing the wrong labels on B-204...","equipment":"PK-04","batch":"B-204"}'` | Returns `INV-xxx` with `status: "queued"` | `{"id":"INV-001","question":"PK-04 is printing the wrong labels on B-204...","equipment":"PK-04","batch":"B-204","ownerId":"maya","status":"queued","createdAt":"2026-09-18T16:32:25.086Z","updatedAt":"2026-09-18T16:32:25.086Z","runIds":[]}` | **PASS** |
+| 8 | Run Flagship Investigation End-to-End | `curl -s -X POST "https://forgeline-assist-app.vercel.app/api/investigations/INV-001/run" -H "x-demo-user: maya"` | Returns ≥2 tasks, 1 proposal, and overlapping branch timestamps | `{"runId":"RUN-001","result":{"status":"completed","taskReceipts":[{"taskId":"TSK-003"},{"taskId":"TSK-004"}],"proposalIds":["PRP-001"]},"events":[...]}` | **PASS** |
+| 9 | Verify Overlapping Branch Timestamps on Live App | Inspected `events` from step 8 for `search_plant_docs`: `safety`, `maintenance`, `quality` | `max(startedAt) <= min(endedAt)` | `safety`: 16:32:25.344Z to 16:32:25.489Z<br>`maintenance`: 16:32:25.344Z to 16:32:25.416Z<br>`quality`: 16:32:25.344Z to 16:32:25.499Z<br>Max Start (16:32:25.344Z) ≤ Min End (16:32:25.416Z) | **PASS** |
+| 10 | Live GET Approval Link Preview Invariant | `curl -s "https://forgeline-assist-app.vercel.app/api/approvals/PRP-001" -H "x-demo-user: priya"` | Status remains `awaiting_approval` | `"status":"awaiting_approval"` | **PASS** |
+| 11 | Live Webhook 503 Rejection (Unset Secret) | `curl -s -i -X POST "https://forgeline-assist-app.vercel.app/api/webhooks/github" -H "Content-Type: application/json" -H "X-Hub-Signature-256: sha256=invalid" -H "X-GitHub-Delivery: d1" -H "X-GitHub-Event: push" -d '{"ref":"refs/heads/main"}'` | HTTP 503 Service Unavailable | `HTTP/2 503`<br>`{"error":"webhook not configured"}` | **PASS** |
+| 12 | Live Emergency Boundary Enforcement | `curl -s -X POST "https://forgeline-assist-app.vercel.app/api/investigations/$EMERG/run" -H "x-demo-user: maya"` with `"There is smoke and someone may be injured near the line"` | `status: "boundary"`, 0 tool events | `{"runId":"RUN-001","result":{"status":"boundary","answer":"This demo cannot manage an emergency. Follow the site's posted emergency procedure and contact the designated emergency response team. Do not wait for an AI answer."},"events":[]}` | **PASS** |
+| 13 | Live Ambiguous Equipment Query | `curl -s -X POST "https://forgeline-assist-app.vercel.app/api/investigations/$AMBIG/run" -H "x-demo-user: maya"` with `"How often does it need checking?"` | `status: "needs_input"`, asks for equipment | `{"runId":"RUN-002","result":{"status":"needs_input","answer":"Which equipment or product do you mean? I only answer from approved documents tied to a specific ID.","questions":["Which equipment: CV-12, PK-04, or PX-20?"]}}` | **PASS** |
+| 14 | Live Approval Rejection: Wrong Role Header | `curl -s -i -X POST "https://forgeline-assist-app.vercel.app/api/approvals/$PROP" -H "Content-Type: application/json" -H "x-demo-user: jordan" -d '{"decision":"approved"}'` | HTTP 403 Forbidden | `HTTP/2 403`<br>`{"error":"wrong_role"}` | **PASS** |
+| 15 | Live Approval Rejection: Self-Approval Attempt | `curl -s -i -X POST "https://forgeline-assist-app.vercel.app/api/approvals/$PROP_PRIYA" -H "Content-Type: application/json" -H "x-demo-user: priya" -d '{"decision":"approved"}'` (proposed by Priya) | HTTP 403 Forbidden | `HTTP/2 403`<br>`{"error":"self_approve"}` | **PASS** |
+| 16 | Live Approval Rejection: Tampered Payload Hash | `curl -s -i -X POST "https://forgeline-assist-app.vercel.app/api/approvals/$PROP" -H "Content-Type: application/json" -H "x-demo-user: priya" -d '{"decision":"approved","payloadHash":"tampered_hash_value"}'` | HTTP 409 Conflict | `HTTP/2 409`<br>`{"error":"payload_changed"}` | **PASS** |
+| 17 | Live Valid Approval Decision | `curl -s -i -X POST "https://forgeline-assist-app.vercel.app/api/approvals/$PROP" -H "Content-Type: application/json" -H "x-demo-user: priya" -d '{"decision":"approved","payloadHash":"$REAL_HASH"}'` | HTTP 200 with status `"approved"` | `HTTP/2 200`<br>`{"id":"PRP-002",...,"status":"approved"}` | **PASS** |
+| 18 | Live Executor Execution of Approved Proposal | `curl -s -i -X POST "https://forgeline-assist-app.vercel.app/api/executor" -H "Content-Type: application/json" -H "x-demo-user: priya" -d '{"proposalId":"$PROP"}'` | HTTP 200 with simulated receipt | `HTTP/2 200`<br>`{"ok":true,"receipt":{"id":"RCP-PRP-002","kind":"simulated","label":"Simulated — no external write (GITHUB_TOKEN/GITHUB_REPO not configured)","note":"No issue was created anywhere."}}` | **PASS** |
+| 19 | Live Executor Re-Execution Rejection | `curl -s -i -X POST "https://forgeline-assist-app.vercel.app/api/executor" -H "Content-Type: application/json" -H "x-demo-user: priya" -d '{"proposalId":"$PROP"}'` | HTTP 409 Conflict | `HTTP/2 409`<br>`{"ok":false,"error":"proposal is succeeded, not approved"}` | **PASS** |

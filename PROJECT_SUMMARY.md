@@ -2,7 +2,11 @@
 
 Updated: 2026-09-18. Product working name: ForgeLine Assist.
 
-## Latest delivery — landing page
+## Latest delivery — demo web app deployment (2026-09-18)
+
+The Next.js demonstration application (`web/`) is now deployed and verified live on Vercel as an independent project at https://forgeline-assist-app.vercel.app. See [qa/qa-report.md](qa/qa-report.md) for live verification results. All four interface views (`/ask`, `/procedures`, `/manual`, `/shift-desk`) and core boundary invariants are live and functional. Dify model calls, real GitHub Issue writes, and transactional email remain fully simulated and mocked in this release pending real credentials; plan.md stages 4 and 5 are not complete.
+
+## Previous delivery — landing page
 
 The user authorized implementation and Vercel deployment of the generated landing mockup. `landing/` now contains the deployed static site at https://forgeline-assist.vercel.app. See [LANDING_REPORT.md](LANDING_REPORT.md). The existing in-progress `web/` app was preserved and excluded from this deployment. The landing preview does not call Dify or execute GitHub actions. Earlier planning-only statements below describe the prior milestone, not the current landing-page authorization.
 

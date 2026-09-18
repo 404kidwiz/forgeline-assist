@@ -4,7 +4,8 @@
 
 # safety net; each package also has its own .gitignore
 node_modules/
+.vercel/
 .env
 .env.local
-!.env.example
+!*.env.example
 logs/
