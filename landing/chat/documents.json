@@ -1,0 +1,213 @@
+[
+  {
+    "id": "SAF-001:v3:Access",
+    "doc_id": "SAF-001",
+    "title": "Guarding and intervention boundaries",
+    "revision": 3,
+    "section": "Access",
+    "category": "safety",
+    "equipment": [
+      "CV-12",
+      "PK-04"
+    ],
+    "effective_date": "2026-09-01",
+    "approval_status": "approved",
+    "owner": "Safety Lead",
+    "excerpt": "CV-12 and PK-04 have designated restricted operating zones. Supervisors must not direct staff to bypass guards or enter restricted zones while equipment is operating."
+  },
+  {
+    "id": "SAF-001:v3:Jam escalation",
+    "doc_id": "SAF-001",
+    "title": "Guarding and intervention boundaries",
+    "revision": 3,
+    "section": "Jam escalation",
+    "category": "safety",
+    "equipment": [
+      "CV-12",
+      "PK-04"
+    ],
+    "effective_date": "2026-09-01",
+    "approval_status": "approved",
+    "owner": "Safety Lead",
+    "excerpt": "A reported jam requiring access to a guarded area must be referred to an authorized maintenance technician under the site's approved equipment-specific isolation procedure. This demonstration does not contain that isolation procedure and cannot provide isolation steps or authorize a restart."
+  },
+  {
+    "id": "SAF-001:v3:Restart authority",
+    "doc_id": "SAF-001",
+    "title": "Guarding and intervention boundaries",
+    "revision": 3,
+    "section": "Restart authority",
+    "category": "safety",
+    "equipment": [
+      "CV-12",
+      "PK-04"
+    ],
+    "effective_date": "2026-09-01",
+    "approval_status": "approved",
+    "owner": "Safety Lead",
+    "excerpt": "The maintenance lead owns mechanical clearance. Quality clearance is also required when affected product has been placed on hold. A chat response does not provide either clearance."
+  },
+  {
+    "id": "SAF-002:v2:Near miss",
+    "doc_id": "SAF-002",
+    "title": "Reporting and emergency boundaries",
+    "revision": 2,
+    "section": "Near miss",
+    "category": "safety",
+    "equipment": [],
+    "effective_date": "2026-09-01",
+    "approval_status": "approved",
+    "owner": "Safety Lead",
+    "excerpt": "Record the time, plant/area, equipment ID, a factual description, and the shift supervisor's name on form NM-01. Send the report through the plant's established reporting channel before shift handover."
+  },
+  {
+    "id": "SAF-002:v2:Immediate danger",
+    "doc_id": "SAF-002",
+    "title": "Reporting and emergency boundaries",
+    "revision": 2,
+    "section": "Immediate danger",
+    "category": "safety",
+    "equipment": [],
+    "effective_date": "2026-09-01",
+    "approval_status": "approved",
+    "owner": "Safety Lead",
+    "excerpt": "Use posted site emergency procedures and designated responders. Do not wait for this demonstration assistant. This document deliberately omits real telephone numbers and site-specific evacuation instructions."
+  },
+  {
+    "id": "MNT-001:v4:Schedule",
+    "doc_id": "MNT-001",
+    "title": "CV-12 maintenance reference",
+    "revision": 4,
+    "section": "Schedule",
+    "category": "maintenance",
+    "equipment": [
+      "CV-12"
+    ],
+    "effective_date": "2026-09-01",
+    "approval_status": "approved",
+    "owner": "Maintenance Lead",
+    "excerpt": "The fictional CV-12 maintenance plan lists an authorized-technician inspection every 250 operating hours or 30 calendar days, whichever occurs first. Supervisors check the maintenance log; this assistant has no live meter or log connection."
+  },
+  {
+    "id": "MNT-001:v4:Fault report",
+    "doc_id": "MNT-001",
+    "title": "CV-12 maintenance reference",
+    "revision": 4,
+    "section": "Fault report",
+    "category": "maintenance",
+    "equipment": [
+      "CV-12"
+    ],
+    "effective_date": "2026-09-01",
+    "approval_status": "approved",
+    "owner": "Maintenance Lead",
+    "excerpt": "For an E17 indication, capture equipment ID, displayed code, time, batch ID, and the operator's observation. Refer the report to the maintenance lead. E17 means inspection required in this fictional manual; no reset or repair steps are supplied. Guarded-area access is subject to SAF-001 section 2."
+  },
+  {
+    "id": "MNT-002:v2:Label mismatch report",
+    "doc_id": "MNT-002",
+    "title": "PK-04 service requests",
+    "revision": 2,
+    "section": "Label mismatch report",
+    "category": "maintenance",
+    "equipment": [
+      "PK-04"
+    ],
+    "effective_date": "2026-09-01",
+    "approval_status": "approved",
+    "owner": "Maintenance Lead",
+    "excerpt": "Capture the expected label, observed label, batch ID, equipment ID, and time. The supervisor requests maintenance review and consults QLT-002 for affected product. Do not claim that a service request has been submitted by the assistant."
+  },
+  {
+    "id": "MNT-002:v2:Procedure limits",
+    "doc_id": "MNT-002",
+    "title": "PK-04 service requests",
+    "revision": 2,
+    "section": "Procedure limits",
+    "category": "maintenance",
+    "equipment": [
+      "PK-04"
+    ],
+    "effective_date": "2026-09-01",
+    "approval_status": "approved",
+    "owner": "Maintenance Lead",
+    "excerpt": "This fictional reference contains no torque values, lubrication specifications, or reset sequence. Refer requests for these values to the maintenance lead and the equipment manufacturer's approved manual."
+  },
+  {
+    "id": "QLT-001:v3:Sampling",
+    "doc_id": "QLT-001",
+    "title": "PX-20 dimensional inspection",
+    "revision": 3,
+    "section": "Sampling",
+    "category": "quality",
+    "equipment": [
+      "PX-20"
+    ],
+    "effective_date": "2026-09-01",
+    "approval_status": "approved",
+    "owner": "Quality Lead",
+    "excerpt": "PX-20 outer diameter is 20.00 mm with tolerance ±0.10 mm. The allowed interval is 19.90–20.10 mm inclusive. Inspect five parts at batch start and five parts every 60 minutes while the batch runs. Record individual measurements, time, batch ID, and inspector on QF-20."
+  },
+  {
+    "id": "QLT-001:v3:Failure",
+    "doc_id": "QLT-001",
+    "title": "PX-20 dimensional inspection",
+    "revision": 3,
+    "section": "Failure",
+    "category": "quality",
+    "equipment": [
+      "PX-20"
+    ],
+    "effective_date": "2026-09-01",
+    "approval_status": "approved",
+    "owner": "Quality Lead",
+    "excerpt": "If any inspected part is outside the allowed interval, place the affected batch on quality hold and contact the quality lead. The quality lead determines the affected scope and disposition; the assistant cannot release product or authorize shipment."
+  },
+  {
+    "id": "QLT-002:v2:Trigger",
+    "doc_id": "QLT-002",
+    "title": "Hold and release",
+    "revision": 2,
+    "section": "Trigger",
+    "category": "quality",
+    "equipment": [
+      "PK-04",
+      "PX-20"
+    ],
+    "effective_date": "2026-09-01",
+    "approval_status": "approved",
+    "owner": "Quality Lead",
+    "excerpt": "A dimensional failure or label mismatch requires affected product to be placed on quality hold pending quality review. Record batch ID, reason, discovery time, and reporter on QH-01."
+  },
+  {
+    "id": "QLT-002:v2:Release",
+    "doc_id": "QLT-002",
+    "title": "Hold and release",
+    "revision": 2,
+    "section": "Release",
+    "category": "quality",
+    "equipment": [
+      "PK-04",
+      "PX-20"
+    ],
+    "effective_date": "2026-09-01",
+    "approval_status": "approved",
+    "owner": "Quality Lead",
+    "excerpt": "Only the quality lead can approve release after documented review. A repaired packing station does not automatically release held product. If maintenance intervention was necessary, mechanical clearance and product disposition remain separate approvals."
+  },
+  {
+    "id": "QLT-001:v2:Sampling",
+    "doc_id": "QLT-001",
+    "title": "PX-20 dimensional inspection",
+    "revision": 2,
+    "section": "Sampling",
+    "category": "quality",
+    "equipment": [
+      "PX-20"
+    ],
+    "effective_date": "2026-08-01",
+    "approval_status": "superseded",
+    "owner": "Quality Lead",
+    "excerpt": "PX-20 outer diameter is 20.00 mm with tolerance ±0.10 mm. Inspect five parts at batch start and five parts every 120 minutes while the batch runs. Record individual measurements, time, batch ID, and inspector on QF-20."
+  }
+]
