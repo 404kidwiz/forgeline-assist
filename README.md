@@ -1,3 +1,11 @@
+# Live landing page
+
+[Open ForgeLine Assist](https://forgeline-assist.vercel.app) · [Delivery report](LANDING_REPORT.md)
+
+Source: `landing/`. Existing application work: `web/` (not deployed by this task). The workspace shown on the landing page is an interactive preview.
+
+---
+
 # Factory Chat Demo
 
 ForgeLine Assist is the working product name for a fictional manufacturing supervisor assistant built around Dify. Its planned workspace combines Ask, Procedures, Manual and Shift Desk, with cited answers, concurrent investigations, persisted demo tasks, approved GitHub Issues actions, document monitoring, and in-app/email notifications.

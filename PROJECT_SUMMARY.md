@@ -2,7 +2,11 @@
 
 Updated: 2026-09-18. Product working name: ForgeLine Assist.
 
-## Current status
+## Latest delivery — landing page
+
+The user authorized implementation and Vercel deployment of the generated landing mockup. `landing/` now contains the deployed static site at https://forgeline-assist.vercel.app. See [LANDING_REPORT.md](LANDING_REPORT.md). The existing in-progress `web/` app was preserved and excluded from this deployment. The landing preview does not call Dify or execute GitHub actions. Earlier planning-only statements below describe the prior milestone, not the current landing-page authorization.
+
+## Earlier planning status
 
 Planning package complete and relocated to the user-selected project root. No application code, Git initialization, model calls, indexing, integrations, monitoring or deployment performed. Current authority remains planning-only. The latest request adds a SchoolAI-inspired DESIGN.md using relevant frontend/UI/UX skills; it does not authorize application implementation.
 

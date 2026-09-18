@@ -1,0 +1,56 @@
+{
+  "url": "https://forgeline-assist.vercel.app",
+  "status": 200,
+  "title": "ForgeLine Assist — The right answer. Right on the floor.",
+  "viewports": [
+    {
+      "width": 320,
+      "scrollWidth": 320
+    },
+    {
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "width": 768,
+      "scrollWidth": 768
+    },
+    {
+      "width": 1086,
+      "scrollWidth": 1086
+    },
+    {
+      "width": 1440,
+      "scrollWidth": 1440
+    }
+  ],
+  "errors": [],
+  "sourceDialog": true,
+  "escapeCloses": true,
+  "documentation": "FORGELINE PREVIEW\n×\nApproved documentation\n\nThe planned workspace routes questions to three source collections:\n\nSafety procedures — SAF-001 and SAF-002\nMaintenance manuals — MNT-001 and MNT-002\nQuality standards — QLT-001 and QLT-002\n\nThis landing page is an interactive preview. The Dify agent and live integrations are not connected here.\n\nBack to workspace",
+  "previewBoundary": true,
+  "assets": [
+    {
+      "file": "styles.css",
+      "status": 200,
+      "matchesLocal": true
+    },
+    {
+      "file": "app.js",
+      "status": 200,
+      "matchesLocal": true
+    },
+    {
+      "file": "assets/dm-sans.ttf",
+      "status": 200,
+      "matchesLocal": true
+    },
+    {
+      "file": "assets/mark.svg",
+      "status": 200,
+      "matchesLocal": true
+    }
+  ],
+  "deployment": "dpl_4WRWqC4ZUZJgCuT4u6yRsRfmWvZw",
+  "passed": true
+}
